@@ -1,3 +1,3 @@
 # grpc-tutorial-in-java
 
-reinvent wheels of [grpc-tutorial](https://github.com/ymmt2005/grpc-tutorial)
+reinvent wheels of [作ってわかる！はじめてのgRPC](https://zenn.dev/hsaki/books/golang-grpc-starting/viewer/intro)
