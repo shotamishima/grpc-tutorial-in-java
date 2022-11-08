@@ -3,6 +3,9 @@ syntax = "proto3";
 package helloworld;
 
 option java_package = "in.tutorial.grpc";
+option java_multiple_files = true;
+option java_outer_classname = "HelloWorldProto";
+option objc_class_prefix = "HLW";
 
 service Greeter {
     rpc SayHello (HelloRequest) returns (HelloReply) {}
