@@ -29,7 +29,11 @@ dependencies {
     implementation "io.grpc:grpc-stub:${grpcVersion}"
     compileOnly "org.apache.tomcat:annotations-api:6.0.53"
 
+    implementation "com.google.protobuf:protobuf-java-util:${protobufVersion}"
+
     testImplementation "io.grpc:grpc-testing:${grpcVersion}"
+    testImplementation "junit:junit:4.13.2"
+    testImplementation "org.mockito:mockito-core:4.8.1"
 }
 
 protobuf {
