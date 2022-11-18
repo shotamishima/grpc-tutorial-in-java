@@ -2,6 +2,7 @@ package in.tutorial.grpc;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
@@ -11,6 +12,7 @@ import io.grpc.stub.StreamObserver;
  * Server that manages startup/shutdown of a Greeter server.
  */
 public class HelloWorldServer {
+    private static final Logger logger = Logger.getLogger(HelloWorldServer.class.getName());
 
     private Server server;
 
@@ -21,6 +23,7 @@ public class HelloWorldServer {
                 .addService(new GreeterImpl())
                 .build()
                 .start();
+        logger.info("Server started, listening on " + port);
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
