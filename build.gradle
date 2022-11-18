@@ -64,9 +64,16 @@ sourceSets{
 // Startscripts is gonna be created automatically in default
 startScripts.enabled = false
 
+task helloWorldServer(type: CreateStartScripts) {
+    mainClass = 'in.tutorial.grpc.HelloWorldServer'
+    applicationName = 'hello-world-server'
+    outputDir = new File(project.buildDir, 'tmp/scripts/' + name)
+    classpath = startScripts.classpath
+}
+
 task helloWorldClient(type: CreateStartScripts) {
-    mainClass = 'in.tutorial.grpc.HelloWorldClient';
-    applicationName = 'hello-world-client';
+    mainClass = 'in.tutorial.grpc.HelloWorldClient'
+    applicationName = 'hello-world-client'
     // project.buildDir: ./build
     // name: grpc-tutorial-in-java
     outputDir = new File(project.buildDir, 'tmp/scripts/' + name)
@@ -74,6 +81,7 @@ task helloWorldClient(type: CreateStartScripts) {
 }
 
 applicationDistribution.into('bin') {
+    from(helloWorldServer)
     from(helloWorldClient)
     fileMode = 0755
 }
