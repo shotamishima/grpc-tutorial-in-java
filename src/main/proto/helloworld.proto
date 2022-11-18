@@ -9,6 +9,7 @@ option objc_class_prefix = "HLW";
 
 service Greeter {
     rpc SayHello (HelloRequest) returns (HelloReply) {}
+    rpc SayHelloServerStreaming (HelloRequest) returns (stream HelloReply) {}
 }
 
 message HelloRequest {
