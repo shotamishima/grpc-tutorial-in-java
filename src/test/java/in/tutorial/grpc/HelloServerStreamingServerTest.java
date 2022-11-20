@@ -2,8 +2,6 @@ package in.tutorial.grpc;
 
 import static org.junit.Assert.assertEquals;
 
-import in.tutorial.grpc.HelloServerStreamingServer;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -11,6 +9,7 @@ import java.util.Iterator;
 import org.junit.Rule;
 import org.junit.Test;
 
+import in.tutorial.grpc.HelloServerStreamingServer.GreeterImpl;
 import io.grpc.ManagedChannel;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
@@ -26,25 +25,31 @@ public class HelloServerStreamingServerTest {
     }
 
     @Test
-    public void test1factor() {
-        // make request object to send server
-        HelloRequest request = HelloRequest.newBuilder().setName("packman").build();
+    public void test1factor() throws Exception {
 
         // server definition
         String serverName = InProcessServerBuilder.generateName();
 
         // start service
-        HelloServerStreamingServer server = new HelloServerStreamingServer(
-                InProcessServerBuilder.forName(serverName).directExecutor().build());
-        server.start();
+        grpcCleanup.register(
+                InProcessServerBuilder
+                        .forName(serverName)
+                        .directExecutor()
+                        .addService(new GreeterImpl())
+                        .build()
+                        .start());
 
         // create client
-        ManagedChannel inProcessChannel = grpcCleanup
-                .register(InProcessChannelBuilder.forName(serverName).directExecutor().build());
-        GreeterGrpc.GreeterBlockingStub stub = GreeterGrpc.newBlockingStub(inProcessChannel);
+        GreeterGrpc.GreeterBlockingStub blockingStub = GreeterGrpc.newBlockingStub(
+                grpcCleanup.register(
+                        InProcessChannelBuilder
+                                .forName(serverName)
+                                .directExecutor()
+                                .build()));
 
         // Get reply from server
-        Iterator<HelloReply> reply = stub.sayHelloServerStreaming(request);
+        Iterator<HelloReply> reply = blockingStub
+                .sayHelloServerStreaming(HelloRequest.newBuilder().setName("packaman").build());
 
         // Response found in server (answer)
         HelloReply correctReply = HelloReply.newBuilder().setMessage("packman").build();
@@ -54,5 +59,10 @@ public class HelloServerStreamingServerTest {
         // assert
         assertEquals(expectation, reply);
     }
+
+    // @Test
+    // public void test2factor() {
+
+    // }
 
 }
