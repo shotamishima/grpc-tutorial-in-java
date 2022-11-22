@@ -55,9 +55,15 @@ public class HelloServerStreamingServerTest {
         HelloReply correctReply = HelloReply.newBuilder().setMessage("packman").build();
         ArrayList<HelloReply> expectation = new ArrayList<>();
         expectation.add(correctReply);
+        expectation.add(correctReply);
 
         // assert
-        assertEquals(expectation, reply);
+        System.out.println(reply);
+        ArrayList<HelloReply> replyArray = new ArrayList<>();
+        while (reply.hasNext()) {
+            replyArray.add(reply.next());
+        }
+        assertEquals(expectation, replyArray);
     }
 
     // @Test

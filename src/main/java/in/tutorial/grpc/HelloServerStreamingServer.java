@@ -21,6 +21,8 @@ public class HelloServerStreamingServer {
         public void sayHelloServerStreaming(HelloRequest req, StreamObserver<HelloReply> responseObserver) {
             HelloReply reply = HelloReply.newBuilder().setMessage("packman").build();
             responseObserver.onNext(reply);
+            responseObserver.onNext(reply);
+            // server-side streamingの場合onNextで必要数のリターンを書くんだと思われる
             responseObserver.onCompleted();
         }
     }
