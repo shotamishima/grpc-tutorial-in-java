@@ -25,7 +25,7 @@ public class HelloServerStreamingServerTest {
     }
 
     @Test
-    public void test1factor() throws Exception {
+    public void test() throws Exception {
 
         // server definition
         String serverName = InProcessServerBuilder.generateName();
@@ -52,10 +52,14 @@ public class HelloServerStreamingServerTest {
                 .sayHelloServerStreaming(HelloRequest.newBuilder().setName("packaman").build());
 
         // Response found in server (answer)
-        HelloReply correctReply = HelloReply.newBuilder().setMessage("packman").build();
         ArrayList<HelloReply> expectation = new ArrayList<>();
-        expectation.add(correctReply);
-        expectation.add(correctReply);
+        for (int i = 0; i < 5; i++) {
+            expectation.add(
+                    HelloReply
+                            .newBuilder()
+                            .setMessage("packman" + String.valueOf(i))
+                            .build());
+        }
 
         // assert
         System.out.println(reply);
