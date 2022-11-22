@@ -2,6 +2,7 @@ package in.tutorial.grpc;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -20,22 +21,20 @@ public class HelloServerStreamingServerTest {
     @Rule
     public final GrpcCleanupRule grpcCleanup = new GrpcCleanupRule();
 
-    public void setUp() {
-
-    }
-
     @Test
     public void test() throws Exception {
 
         // server definition
         String serverName = InProcessServerBuilder.generateName();
+        Collection<HelloReply> features = new ArrayList<>();
+        features.add(HelloReply.newBuilder().setMessage("test").build());
 
         // start service
         grpcCleanup.register(
                 InProcessServerBuilder
                         .forName(serverName)
                         .directExecutor()
-                        .addService(new GreeterImpl())
+                        .addService(new GreeterImpl(features))
                         .build()
                         .start());
 
@@ -53,13 +52,8 @@ public class HelloServerStreamingServerTest {
 
         // Response found in server (answer)
         ArrayList<HelloReply> expectation = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            expectation.add(
-                    HelloReply
-                            .newBuilder()
-                            .setMessage("packman" + String.valueOf(i))
-                            .build());
-        }
+        expectation.add(
+                HelloReply.newBuilder().setMessage("return_test").build());
 
         // assert
         System.out.println(reply);
@@ -70,9 +64,27 @@ public class HelloServerStreamingServerTest {
         assertEquals(expectation, replyArray);
     }
 
-    // @Test
-    // public void test2factor() {
+    @Test
+    public void test2() throws IOException {
+        // Generate unique in-process server name
+        String serverName = InProcessServerBuilder.generateName();
 
-    // }
+        Collection<HelloReply> features = new ArrayList<>();
+
+        // start server
+        HelloServerStreamingServer server = new HelloServerStreamingServer(
+                InProcessServerBuilder.forName(serverName).directExecutor(), 5000, features);
+        server.start();
+
+        // Generate client
+        ManagedChannel inProcessChannel = grpcCleanup.register(
+                InProcessChannelBuilder.forName(serverName).directExecutor().build());
+        GreeterGrpc.GreeterStub asyncStub = GreeterGrpc.newStub(inProcessChannel);
+        Iterator<HelloReply> reply = asyncStub.sayHelloServerStreaming(
+            HelloRequest.newBuilder().setName("tmp").build(),
+            );
+        ;
+
+    }
 
 }
