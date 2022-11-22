@@ -56,7 +56,8 @@ public class HelloServerStreamingServer {
         @Override
         public void sayHelloServerStreaming(HelloRequest req, StreamObserver<HelloReply> responseObserver) {
             for (HelloReply feature : features) {
-                HelloReply.newBuilder().setMessage(req.getName() + feature.getMessage()).build();
+                HelloReply newReply = HelloReply.newBuilder().setMessage(req.getName() + feature.getMessage()).build();
+                responseObserver.onNext(newReply);
             }
             responseObserver.onCompleted();
         }
