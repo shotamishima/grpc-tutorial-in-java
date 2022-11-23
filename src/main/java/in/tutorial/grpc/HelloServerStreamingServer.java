@@ -47,12 +47,12 @@ public class HelloServerStreamingServer {
     static class GreeterImpl extends GreeterGrpc.GreeterImplBase {
 
         private final Collection<HelloReply> features;
-        private final String prefix = "return_";
 
         public GreeterImpl(Collection<HelloReply> features) {
             this.features = features;
         }
 
+        // responseObserver is not used currently
         @Override
         public void sayHelloServerStreaming(HelloRequest req, StreamObserver<HelloReply> responseObserver) {
             for (HelloReply feature : features) {
