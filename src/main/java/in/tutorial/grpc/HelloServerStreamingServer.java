@@ -1,14 +1,18 @@
 package in.tutorial.grpc;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 
 public class HelloServerStreamingServer {
+
+    private static final Logger logger = Logger.getLogger(HelloServerStreamingServer.class.getName());
 
     private final int port;
     private final Server server;
@@ -22,6 +26,7 @@ public class HelloServerStreamingServer {
     // Start serving requests
     public void start() throws IOException {
         server.start();
+        logger.info("Server started...");
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
@@ -41,6 +46,26 @@ public class HelloServerStreamingServer {
         if (server != null) {
             server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
         }
+    }
+
+    public void blockUntilShutdown() throws InterruptedException {
+        if (server != null) {
+            server.awaitTermination();
+        }
+    }
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+
+        Collection<HelloReply> features = new ArrayList<>();
+        features.add(HelloReply.newBuilder().setMessage(" world").build());
+
+        // TODO: Duplications are exist regarding port features
+        ServerBuilder<?> builder = ServerBuilder.forPort(50051).addService(new GreeterImpl(null));
+
+        final HelloServerStreamingServer server = new HelloServerStreamingServer(builder, 50051, features);
+
+        server.start();
+        server.blockUntilShutdown();
     }
 
     // implement GreeterGrpc.GreeterImplBase
