@@ -11,6 +11,9 @@ service Greeter {
     rpc SayHello (HelloRequest) returns (HelloReply) {}
     rpc SayHelloServerStreaming (HelloRequest) returns (stream HelloReply) {}
     rpc SayHelloClientStreaming (stream HelloRequest) returns (HelloReply) {}
+    
+    // Route guide based
+    rpc RouteChat(stream RouteNote) returns (stream RouteNote) {}
 }
 
 message HelloRequest {
@@ -19,4 +22,20 @@ message HelloRequest {
 
 message HelloReply {
     string message = 1;
+}
+
+// For Route guide
+message Point {
+    int32 latitude = 1;
+    int32 longitude = 2;
+}
+
+message RouteNote {
+    Point location = 1;
+    string message = 2;
+}
+
+message Feature {
+    string name = 1;
+    Point location = 2;
 }
