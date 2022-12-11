@@ -80,7 +80,7 @@ public class RouteGuideServer {
                 public void onNext(RouteNote note) {
                     List<RouteNote> notes = getOrCreateNotes(note.getLocation());
 
-                    // Respond with all previious notes at this location.
+                    // Respond with all previous notes at this location.
                     for (RouteNote prevNote : notes.toArray(new RouteNote[0])) {
                         responseObserver.onNext(prevNote);
                     }

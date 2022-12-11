@@ -70,6 +70,7 @@ public class RouteGuideServerTest {
         StreamObserver<RouteNote> requestObserver = stub.routeChat(responseObserver);
         // Whatever argument can be allowed to set on onNext.
         // never test method 'onNext' isn't called once.
+        // allow any value of RouteNote class for argument
         verify(responseObserver, never()).onNext(any(RouteNote.class));
 
         requestObserver.onNext(n1);
@@ -80,11 +81,22 @@ public class RouteGuideServerTest {
 
         requestObserver.onNext(n3);
         ArgumentCaptor<RouteNote> routeNoteCaptor = ArgumentCaptor.forClass(RouteNote.class);
+        // Verify client argument has location: p1, message:m1
         verify(responseObserver,
                 timeout(100).times(++timesOnNext)).onNext(routeNoteCaptor.capture());
         RouteNote result = routeNoteCaptor.getValue();
         assertEquals(p1, result.getLocation());
         assertEquals("m1", result.getMessage());
+
+        requestObserver.onNext(n4);
+        routeNoteCaptor = ArgumentCaptor.forClass(RouteNote.class);
+        // responseObserver is called 2 times because timesOnNext = 2 in this time.
+        verify(responseObserver, timeout(100).times(++timesOnNext)).onNext(routeNoteCaptor.capture());
+        System.out.println("timesOnNext: " + timesOnNext);
+        result = routeNoteCaptor.getAllValues().get(timesOnNext - 1);
+        System.out.println("timesOnNext: " + (timesOnNext - 1));
+        assertEquals(p2, result.getLocation());
+        assertEquals("m2", result.getMessage());
 
         requestObserver.onCompleted();
     }
