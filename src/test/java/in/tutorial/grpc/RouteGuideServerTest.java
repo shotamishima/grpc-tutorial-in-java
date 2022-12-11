@@ -98,6 +98,38 @@ public class RouteGuideServerTest {
         assertEquals(p2, result.getLocation());
         assertEquals("m2", result.getMessage());
 
+        requestObserver.onNext(n5);
+        routeNoteCaptor = ArgumentCaptor.forClass(RouteNote.class);
+        timesOnNext += 2;
+        verify(responseObserver, timeout(100).times(timesOnNext)).onNext(routeNoteCaptor.capture());
+        result = routeNoteCaptor.getAllValues().get(timesOnNext - 2);
+        assertEquals(p1, result.getLocation());
+        assertEquals("m1", result.getMessage());
+        result = routeNoteCaptor.getAllValues().get(timesOnNext - 1);
+        assertEquals(p1, result.getLocation());
+        assertEquals("m3", result.getMessage());
+
+        // responseObserver return streamObserver. by executing onNext method, we can
+        // get previous notes associated with key 'location'
+        requestObserver.onNext(n6);
+        routeNoteCaptor = ArgumentCaptor.forClass(RouteNote.class);
+        timesOnNext += 3;
+        verify(responseObserver, timeout(100).times(timesOnNext)).onNext(routeNoteCaptor.capture());
+        result = routeNoteCaptor.getAllValues().get(timesOnNext - 3);
+        System.out.println(timesOnNext - 3);
+        assertEquals(p1, result.getLocation());
+        assertEquals("m1", result.getMessage());
+        result = routeNoteCaptor.getAllValues().get(timesOnNext - 2);
+        System.out.println(timesOnNext - 2);
+        assertEquals(p1, result.getLocation());
+        assertEquals("m3", result.getMessage());
+        result = routeNoteCaptor.getAllValues().get(timesOnNext - 1);
+        System.out.println(timesOnNext - 1);
+        assertEquals(p1, result.getLocation());
+        assertEquals("m5", result.getMessage());
+
         requestObserver.onCompleted();
+        verify(responseObserver, timeout(100)).onCompleted();
+        verify(responseObserver, never()).onError(any(Throwable.class));
     }
 }
