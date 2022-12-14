@@ -39,3 +39,8 @@ message Feature {
     string name = 1;
     Point location = 2;
 }
+
+// Not used in the RPC. Instead, this is here for the form serialized to disk.
+message FeatureDatabase {
+    repeated Feature feature = 1;
+}

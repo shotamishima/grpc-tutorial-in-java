@@ -1,6 +1,8 @@
 package in.tutorial.grpc;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,6 +12,9 @@ import com.google.protobuf.Message;
 import in.tutorial.grpc.GreeterGrpc.GreeterBlockingStub;
 import in.tutorial.grpc.GreeterGrpc.GreeterStub;
 import io.grpc.Channel;
+import io.grpc.Grpc;
+import io.grpc.InsecureChannelCredentials;
+import io.grpc.ManagedChannel;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
@@ -81,6 +86,31 @@ public class RouteGuideClient {
         requestObserver.onCompleted();
         // Return the latch while receiving happens asynchronously
         return finishLatch;
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        String target = "locahost:8980";
+        if (args.length > 0) {
+            if ("--help".equals(args[0])) {
+                System.err.println("Usage: [target]");
+                System.err.println("");
+                System.err.println("  target The server to connect to. Defaults to " + target);
+            }
+            target = args[0];
+        }
+
+        ManagedChannel channel = Grpc.newChannelBuilder(target, InsecureChannelCredentials.create()).build();
+        try {
+            RouteGuideClient client = new RouteGuideClient(channel);
+            // Send and receive some notes.
+            CountDownLatch finishLatch = client.routeChat();
+            if (!finishLatch.await(1, TimeUnit.MINUTES)) {
+                client.warning("routeChat can not finish within 1 minutes");
+            }
+        } finally {
+            channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
+        }
+
     }
 
     private void info(String msg, Object... params) {

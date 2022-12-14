@@ -1,6 +1,7 @@
 package in.tutorial.grpc;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -22,6 +23,15 @@ public class RouteGuideServer {
 
     private final int port;
     private final Server server;
+
+    public RouteGuideServer(int port) {
+        this(port, RouteGuideUtil.getDefaultFeatureFile());
+    }
+
+    public RouteGuideServer(int port, URL featureFile) {
+        this(Grpc.newServerBuilderForPort(port, InsecureServerCredentials.create()), port,
+                RouteGuideUtil.parseFeatures(featureFile));
+    }
 
     public RouteGuideServer(ServerBuilder<?> serverBuilder, int port, Collection<Feature> features) {
         this.port = port;
@@ -53,6 +63,18 @@ public class RouteGuideServer {
         if (server != null) {
             server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
         }
+    }
+
+    public void blockUntilShutdown() throws InterruptedException {
+        if (server != null) {
+            server.awaitTermination();
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        RouteGuideServer server = new RouteGuideServer(8980);
+        server.start();
+        server.blockUntilShutdown();
     }
 
     public static class RouteGuideService extends GreeterGrpc.GreeterImplBase {
