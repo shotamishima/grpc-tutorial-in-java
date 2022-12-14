@@ -9,10 +9,16 @@ import org.junit.runners.JUnit4;
 import in.tutorial.grpc.GreeterGrpc.GreeterImplBase;
 import in.tutorial.grpc.RouteGuideClient.TestHelper;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -84,8 +90,7 @@ public class RouteGuideClientTest {
                 return requestObserver;
             }
         };
-
-        // TODO serviceRegistry
+        serviceRegistry.addService(routeChatImpl);
 
         // start routeChat
         CountDownLatch latch = client.routeChat();
@@ -93,6 +98,28 @@ public class RouteGuideClientTest {
         // Stand by current thread until count down latch goes 0, as long as 1 second
         // passes
         assertTrue(allRequestsDelivered.await(1, TimeUnit.SECONDS));
+        assertEquals(Arrays.asList("First message", "Second message", "Third message", "Fourth message"),
+                messagesDelivered);
+        assertEquals(
+                Arrays.asList(
+                        Point.newBuilder().setLatitude(0).setLongitude(0).build(),
+                        Point.newBuilder().setLatitude(0).setLongitude(10_000_000).build(),
+                        Point.newBuilder().setLatitude(10_000_000).setLongitude(0).build(),
+                        Point.newBuilder().setLatitude(10_000_000).setLongitude(10_000_000).build()),
+                locationsDelivered);
 
+        // let the server send out two simple response messages and verify that the
+        // client receives them.
+        // allow some timeout for verify() if not using directExecutor
+        responseObserverRef.get().onNext(fakeResponse1);
+        verify(testHelper).onMessage(fakeResponse1);
+        responseObserverRef.get().onNext(fakeResponse2);
+        verify(testHelper).onMessage(fakeResponse2);
+
+        responseObserverRef.get().onCompleted();
+
+        // verify error
+        assertTrue(latch.await(1, TimeUnit.SECONDS));
+        verify(testHelper, never()).onRpcError(any(Throwable.class));
     }
 }
