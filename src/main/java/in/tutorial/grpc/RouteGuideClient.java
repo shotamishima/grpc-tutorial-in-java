@@ -39,7 +39,7 @@ public class RouteGuideClient {
         StreamObserver<RouteNote> requestObserver = asyncStab.routeChat(new StreamObserver<RouteNote>() {
             @Override
             public void onNext(RouteNote note) {
-                info("Got message '{0}' at {1}, {2}", note.getMessage(), note.getLocation().getLatitude(),
+                info("Got message {0} at {1}, {2}", note.getMessage(), note.getLocation().getLatitude(),
                         note.getLocation().getLongitude());
                 if (testHelper != null) {
                     testHelper.onMessage(note);
@@ -70,7 +70,7 @@ public class RouteGuideClient {
                     newNote("Fourth message", 10_000_000, 10_000_000)
             };
             for (RouteNote request : requests) {
-                info("Send message '{0}' at {1}, {2}",
+                info("Send message {0} at {1}, {2}",
                         request.getMessage(),
                         request.getLocation().getLatitude(),
                         request.getLocation().getLatitude());
@@ -89,7 +89,7 @@ public class RouteGuideClient {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        String target = "locahost:8980";
+        String target = "localhost:8980";
         if (args.length > 0) {
             if ("--help".equals(args[0])) {
                 System.err.println("Usage: [target]");

@@ -12,6 +12,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.checkerframework.common.reflection.qual.GetMethod;
+
 import io.grpc.Grpc;
 import io.grpc.InsecureServerCredentials;
 import io.grpc.Server;
@@ -109,6 +111,11 @@ public class RouteGuideServer {
 
                     // Now add the new note to the list
                     notes.add(note);
+                    logger.log(
+                            Level.INFO,
+                            "Added note info: message: " + note.getMessage()
+                                    + ", lattitude: " + note.getLocation().getLatitude()
+                                    + ", longitude: " + note.getLocation().getLongitude());
                 }
 
                 @Override
@@ -124,7 +131,7 @@ public class RouteGuideServer {
         }
 
         /**
-         * Ger the notes list for the given location. If missing, create it.
+         * Get the notes list for the given location. If missing, create it.
          * 
          * @param location
          * @return

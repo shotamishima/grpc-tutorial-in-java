@@ -113,5 +113,7 @@ applicationDistribution.into('bin') {
     from(helloWorldClient)
     from(helloServerStreamingServer)
     from(helloServerStreamingClient)
+    from(RouteGuideServer)
+    from(RouteGuideClient)
     fileMode = 0755
 }
