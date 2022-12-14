@@ -94,6 +94,20 @@ task helloServerStreamingClient(type: CreateStartScripts) {
     classpath = startScripts.classpath
 }
 
+task RouteGuideServer(type: CreateStartScripts) {
+    mainClass = 'in.tutorial.grpc.RouteGuideServer'
+    applicationName = 'routeguide-server'
+    outputDir = new File(project.buildDir, 'tmp/scripts/' + name)
+    classpath = startScripts.classpath
+}
+
+task RouteGuideClient(type: CreateStartScripts) {
+    mainClass = 'in.tutorial.grpc.RouteGuideClient'
+    applicationName = 'routeguide-client'
+    outputDir = new File(project.buildDir, 'tmp/scripts/' + name)
+    classpath = startScripts.classpath
+}
+
 applicationDistribution.into('bin') {
     from(helloWorldServer)
     from(helloWorldClient)
