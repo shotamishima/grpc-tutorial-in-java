@@ -24,11 +24,11 @@ public class RouteGuideServer {
     private final int port;
     private final Server server;
 
-    public RouteGuideServer(int port) {
+    public RouteGuideServer(int port) throws IOException {
         this(port, RouteGuideUtil.getDefaultFeatureFile());
     }
 
-    public RouteGuideServer(int port, URL featureFile) {
+    public RouteGuideServer(int port, URL featureFile) throws IOException {
         this(Grpc.newServerBuilderForPort(port, InsecureServerCredentials.create()), port,
                 RouteGuideUtil.parseFeatures(featureFile));
     }
